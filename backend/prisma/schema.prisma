@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User 모델
+model User {
+  id              Int      @id @default(autoincrement())
+  email           String?  @unique
+  username        String?  @unique
+  
+  // 개인화 필드
+  interests       Json?    // ["tech", "crypto"]
+  portfolio       Json?    // ["NVDA", "AAPL", "TSLA"]
+  experience      String?  // "beginner", "intermediate", "advanced"
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  userEvents      UserEvent[]
+  
+  @@map("users")
+}
+
+// Event 모델
+model Event {
+  id           Int          @id @default(autoincrement())
+  title        String
+  event_type   String
+  datetime     DateTime
+  impact_level String
+  tags         Json?
+  description  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  
+  userEvents   UserEvent[]
+  
+  @@map("events")
+}
+
+// UserEvent 모델
+model UserEvent {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  event_id    Int
+  notify_time DateTime?
+  completed   Boolean   @default(false)
+  completed_at DateTime?
+  note        String?
+  createdAt   DateTime  @default(now())
+  
+  event       Event     @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@unique([user_id, event_id])
+  @@map("user_events")
+}
