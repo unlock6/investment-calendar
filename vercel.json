@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://investment-calendar-production.up.railway.app/api/:path*"
+      "destination": "https://investment-calendar-production-15e7.up.railway.app/api/:path*"
     },
     {
       "source": "/(.*)",
