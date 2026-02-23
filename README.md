@@ -1,3 +1,4 @@
+
 # 투자 이벤트 캘린더 MVP
 
 초개인화 투자 이벤트 캘린더의 프론트엔드 MVP입니다.
@@ -120,3 +121,5 @@ const handleAddToCalendar = async () => {
 - [ ] 이벤트 검색 기능
 - [ ] 알림 설정
 - [ ] 모바일 앱 (React Native)
+
+
