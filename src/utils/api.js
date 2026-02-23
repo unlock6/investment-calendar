@@ -3,7 +3,7 @@
  * 환경변수 기반 API 베이스 URL 관리 및 공통 fetch 래퍼
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 /**
  * API fetch 래퍼 - 공통 에러 핸들링 포함
