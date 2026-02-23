@@ -17,18 +17,8 @@ const prisma = new PrismaClient();
 
 // === 미들웨어 ===
 
-// CORS (다중 origin 지원)
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',');
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS not allowed'));
-    }
-  },
-  credentials: true
-}));
+// CORS (베타: 전체 허용)
+app.use(cors());
 
 // Body parser (10MB 제한)
 app.use(express.json({ limit: '10mb' }));
