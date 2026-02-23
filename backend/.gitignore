@@ -16,5 +16,5 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Prisma
-prisma/migrations/
+# Prisma (migrations은 배포에 필요하므로 커밋 포함)
+# prisma/migrations/
