@@ -195,13 +195,10 @@ app.listen(PORT, '0.0.0.0', async () => {
   console.log(`   - POST /api/ai/chat`);
   console.log(`   - GET  /health`);
   
-  // 🆕 서버 시작 시 한 번 수집
-  console.log('\n🔄 초기 데이터 수집 시작...');
-  try {
-    await collectAllData();
-  } catch (error) {
-    console.error('❌ 초기 수집 실패:', error);
-  }
+  // 서버 시작 후 비동기로 데이터 수집 (서버 응답에 영향 없음)
+  setTimeout(() => {
+    collectAllData().catch(err => console.error('❌ 초기 수집 실패:', err));
+  }, 5000);
   
   console.log('⏰ 스케줄러 시작:');
   console.log('   - 매일 자정: 이벤트 자동 업데이트');
