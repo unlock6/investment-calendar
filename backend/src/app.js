@@ -82,6 +82,9 @@ app.get('/health', (req, res) => {
   });
 });
 
+// DB 없이 테스트
+app.get('/test', (req, res) => res.json({ ok: true }));
+
 // 404 핸들러
 app.use((req, res) => {
   res.status(404).json({ error: '요청한 리소스를 찾을 수 없습니다.' });
