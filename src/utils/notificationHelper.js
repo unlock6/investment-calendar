@@ -71,7 +71,7 @@ export function scheduleEventNotification(event, minutesBefore = 60) {
  */
 export async function checkAndScheduleNotifications() {
   try {
-    const response = await fetch('http://localhost:5000/api/user-events');
+    const response = await fetch('/api/user-events');
     const userEvents = await response.json();
 
     let scheduled = 0;
