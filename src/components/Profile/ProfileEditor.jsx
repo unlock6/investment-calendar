@@ -41,7 +41,7 @@ const SECTION_COLORS = {
   portfolio: { bg: '#ecfdf5', accent: '#10b981' },
 };
 
-const ProfileEditor = ({ profile: initialProfile, onSave, onClose }) => {
+const ProfileEditor = ({ profile: initialProfile, onSave, onClose, onPortfolioUpdate }) => {
   const [profile, setProfile] = useState(initialProfile || {
     name: '', email: '', interests: [], portfolio: []
   });
@@ -60,13 +60,21 @@ const ProfileEditor = ({ profile: initialProfile, onSave, onClose }) => {
   const addStock = (ticker) => {
     const t = ticker.trim().toUpperCase();
     if (t && !profile.portfolio.includes(t)) {
-      setProfile(prev => ({ ...prev, portfolio: [...prev.portfolio, t] }));
+      const newProfile = { ...profile, portfolio: [...profile.portfolio, t] };
+      setProfile(newProfile);
       setStockInput('');
+      // 빠른 추가는 즉시 저장 — 따로 저장 버튼 누를 필요 없음
+      localStorage.setItem('userProfile', JSON.stringify(newProfile));
+      if (onPortfolioUpdate) onPortfolioUpdate(newProfile);
     }
   };
 
   const removeStock = (ticker) => {
-    setProfile(prev => ({ ...prev, portfolio: prev.portfolio.filter(s => s !== ticker) }));
+    const newProfile = { ...profile, portfolio: profile.portfolio.filter(s => s !== ticker) };
+    setProfile(newProfile);
+    // 삭제도 즉시 저장
+    localStorage.setItem('userProfile', JSON.stringify(newProfile));
+    if (onPortfolioUpdate) onPortfolioUpdate(newProfile);
   };
 
   const handleSave = () => {

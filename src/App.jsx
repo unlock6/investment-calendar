@@ -156,6 +156,11 @@ function App() {
     toast.success('프로필이 업데이트되었습니다!');
   };
 
+  // 종목 빠른 추가/삭제 → 모달 닫지 않고 즉시 상태 반영
+  const handlePortfolioUpdate = (updatedProfile) => {
+    setUserProfile(updatedProfile);
+  };
+
   const handleCreateEvent = async (eventData) => {
     // TODO: 백엔드 API 연동 시 실제 저장
     toast.success('이벤트가 생성되었습니다!');
@@ -275,19 +280,16 @@ function App() {
   const overlayTouchMoved = React.useRef(false);
 
   // 삼성/안드로이드: 키보드 열릴 때 패널 bottom 동적 조정
+  // window.innerHeight 변화로 감지 (Samsung Chrome 호환)
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   useEffect(() => {
-    if (!window.visualViewport) return;
-    const onViewportResize = () => {
-      const kbHeight = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
-      setKeyboardHeight(kbHeight);
+    const fullHeight = window.innerHeight;
+    const onResize = () => {
+      const diff = fullHeight - window.innerHeight;
+      setKeyboardHeight(diff > 50 ? diff : 0); // 50px 이상 줄어들면 키보드로 판단
     };
-    window.visualViewport.addEventListener('resize', onViewportResize);
-    window.visualViewport.addEventListener('scroll', onViewportResize);
-    return () => {
-      window.visualViewport.removeEventListener('resize', onViewportResize);
-      window.visualViewport.removeEventListener('scroll', onViewportResize);
-    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
   // ========================
@@ -693,11 +695,15 @@ function App() {
       )}
 
       {/* ===== 오른쪽 사이드바 ===== */}
-      {/* onClick stopPropagation: 패널 내 클릭이 오버레이로 전파되지 않도록 */}
+      {/* stopPropagation: 패널 내 클릭·터치가 오버레이로 버블링되지 않도록 */}
       {/* 모바일: bottom은 키보드 높이에 따라 동적 조정 (삼성 Android 대응) */}
       <aside
         onClick={(e) => e.stopPropagation()}
-        style={isMobile ? { bottom: `${keyboardHeight > 10 ? keyboardHeight + 4 : 64}px` } : {}}
+        onTouchStart={(e) => e.stopPropagation()}
+        style={isMobile ? {
+          bottom: `${keyboardHeight > 10 ? keyboardHeight + 4 : 64}px`,
+          overscrollBehavior: 'contain',   // 스크롤 끝에서 오버스크롤이 오버레이로 전파되지 않도록
+        } : {}}
         className={`
         ${isMobile ? 'fixed top-0 right-0 z-50 w-[85vw] max-w-sm' : 'relative'}
         ${isMobile
@@ -867,6 +873,7 @@ function App() {
           profile={userProfile}
           onSave={handleProfileSave}
           onClose={() => setShowProfileEditor(false)}
+          onPortfolioUpdate={handlePortfolioUpdate}
         />
       )}
 
