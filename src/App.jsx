@@ -274,6 +274,22 @@ function App() {
   // 오버레이 스와이프 vs 탭 구분용 ref
   const overlayTouchMoved = React.useRef(false);
 
+  // 삼성/안드로이드: 키보드 열릴 때 패널 bottom 동적 조정
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  useEffect(() => {
+    if (!window.visualViewport) return;
+    const onViewportResize = () => {
+      const kbHeight = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+      setKeyboardHeight(kbHeight);
+    };
+    window.visualViewport.addEventListener('resize', onViewportResize);
+    window.visualViewport.addEventListener('scroll', onViewportResize);
+    return () => {
+      window.visualViewport.removeEventListener('resize', onViewportResize);
+      window.visualViewport.removeEventListener('scroll', onViewportResize);
+    };
+  }, []);
+
   // ========================
   //  로딩 & 에러 화면
   // ========================
@@ -678,11 +694,12 @@ function App() {
 
       {/* ===== 오른쪽 사이드바 ===== */}
       {/* onClick stopPropagation: 패널 내 클릭이 오버레이로 전파되지 않도록 */}
-      {/* 모바일에서 bottom-16(64px)으로 하단 네비바 영역을 피함 */}
+      {/* 모바일: bottom은 키보드 높이에 따라 동적 조정 (삼성 Android 대응) */}
       <aside
         onClick={(e) => e.stopPropagation()}
+        style={isMobile ? { bottom: `${keyboardHeight > 10 ? keyboardHeight + 4 : 64}px` } : {}}
         className={`
-        ${isMobile ? 'fixed top-0 bottom-16 right-0 z-50 w-[85vw] max-w-sm' : 'relative'}
+        ${isMobile ? 'fixed top-0 right-0 z-50 w-[85vw] max-w-sm' : 'relative'}
         ${isMobile
           ? (rightPanelOpen ? 'translate-x-0' : 'translate-x-full')
           : (rightPanelOpen ? 'w-80' : 'w-0')
@@ -795,6 +812,10 @@ function App() {
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && handleSendChat()}
+                        onFocus={(e) => {
+                          // 안드로이드: 키보드 올라온 후 입력창이 보이도록 스크롤
+                          setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 400);
+                        }}
                         placeholder="메시지를 입력하세요..."
                         className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         disabled={chatLoading}
