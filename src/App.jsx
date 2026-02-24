@@ -276,21 +276,8 @@ function App() {
     setRightPanelOpen(true);
   };
 
-  // 오버레이 스와이프 vs 탭 구분용 ref
-  const overlayTouchMoved = React.useRef(false);
-
-  // 삼성/안드로이드: 키보드 열릴 때 패널 bottom 동적 조정
-  // window.innerHeight 변화로 감지 (Samsung Chrome 호환)
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-  useEffect(() => {
-    const fullHeight = window.innerHeight;
-    const onResize = () => {
-      const diff = fullHeight - window.innerHeight;
-      setKeyboardHeight(diff > 50 ? diff : 0); // 50px 이상 줄어들면 키보드로 판단
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
+  // 오버레이 탭 감지: touchEnd에서 좌표 비교로 ghost click 완전 차단
+  const overlayTouchStart = React.useRef(null);
 
   // ========================
   //  로딩 & 에러 화면
@@ -341,8 +328,8 @@ function App() {
       )}
 
       {/* ===== 왼쪽 사이드바 ===== */}
-      <aside className={`
-        ${isMobile ? 'fixed inset-y-0 left-0 z-50' : 'relative'}
+      <aside style={isMobile ? { height: '100dvh' } : {}} className={`
+        ${isMobile ? 'fixed top-0 left-0 z-50' : 'relative'}
         ${isMobile
           ? (leftSidebarOpen ? 'translate-x-0' : '-translate-x-full')
           : (leftSidebarOpen ? 'w-64 lg:w-72' : 'w-0')
@@ -666,13 +653,21 @@ function App() {
       </main>
 
       {/* 오른쪽 패널 오버레이 (모바일) */}
-      {/* 스크롤(touchmove) 후 click은 무시 → 순수 탭만 닫기 */}
+      {/* onClick 대신 onTouchEnd 좌표 비교: Android ghost click 완전 차단 */}
       {isMobile && rightPanelOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
-          onTouchStart={() => { overlayTouchMoved.current = false; }}
-          onTouchMove={() => { overlayTouchMoved.current = true; }}
-          onClick={() => { if (!overlayTouchMoved.current) setRightPanelOpen(false); }}
+          onTouchStart={(e) => {
+            overlayTouchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          }}
+          onTouchEnd={(e) => {
+            if (!overlayTouchStart.current) return;
+            const t = e.changedTouches[0];
+            const dx = Math.abs(t.clientX - overlayTouchStart.current.x);
+            const dy = Math.abs(t.clientY - overlayTouchStart.current.y);
+            if (dx < 10 && dy < 10) setRightPanelOpen(false); // 10px 이내 = 탭
+            overlayTouchStart.current = null;
+          }}
         />
       )}
 
@@ -683,7 +678,7 @@ function App() {
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
         style={isMobile ? {
-          bottom: `${keyboardHeight > 10 ? keyboardHeight + 4 : 0}px`,
+          height: '100dvh',           /* 키보드 열리면 자동으로 줄어듦 (Chrome 108+ / Samsung Internet) */
           overscrollBehavior: 'contain',
         } : {}}
         className={`
