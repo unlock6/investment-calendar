@@ -51,17 +51,28 @@ function App() {
   // ========================
 
   useEffect(() => {
+    let prevWidth = window.innerWidth;
+
     const checkMobile = () => {
-      const mobile = window.innerWidth < 1024;
+      const currentWidth = window.innerWidth;
+      const mobile = currentWidth < 1024;
       setIsMobile(mobile);
+
       if (mobile) {
         setLeftSidebarOpen(false);
-        setRightPanelOpen(false);
+        // 너비가 바뀔 때만 패널 닫기 (기기 회전)
+        // 높이만 바뀌는 경우(삼성 URL바 숨김/표시, 키보드 열림)는 무시
+        if (currentWidth !== prevWidth) {
+          setRightPanelOpen(false);
+        }
       } else {
         setLeftSidebarOpen(true);
         setRightPanelOpen(true);
       }
+
+      prevWidth = currentWidth;
     };
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
