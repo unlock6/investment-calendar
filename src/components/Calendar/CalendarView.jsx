@@ -61,6 +61,29 @@ const CalendarView = ({ events, onEventClick, isMobile, leftSidebarOpen, rightPa
     // 이모지 접두어 제거 (렌더러에서 직접 표시하므로)
     const rawTitle = arg.event.title.replace(/^[⭐🏛️💰📊🔔📉📈🏭💹🎯✨🔮]\s*/, '');
 
+    // 모바일: 더 작고 컴팩트하게 표시
+    if (isMobile) {
+      return (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '2px',
+          padding: '1px 2px', overflow: 'hidden', width: '100%',
+          cursor: 'pointer',
+        }}>
+          <span style={{
+            width: '5px', height: '5px', borderRadius: '50%',
+            background: dotColor, flexShrink: 0, display: 'inline-block'
+          }} />
+          <span style={{
+            fontSize: '9px', overflow: 'hidden',
+            textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1,
+            fontWeight: 600, lineHeight: '1.3',
+          }}>
+            {rawTitle}
+          </span>
+        </div>
+      );
+    }
+
     return (
       <div style={{
         display: 'flex', alignItems: 'center', gap: '3px',

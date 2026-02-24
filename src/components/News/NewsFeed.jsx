@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { fetchNews } from '../../utils/api';
 
 const FILTERS = [
-  { id: 'all',    label: '전체' },
-  { id: 'global', label: '글로벌' },
-  { id: 'korea',  label: '국내' },
+  { id: 'all',       label: '전체' },
+  { id: 'global',    label: '글로벌' },
+  { id: 'korea',     label: '국내' },
+  { id: 'portfolio', label: '내 종목' },
 ];
 
 // 포트폴리오 관련 키워드 매칭
@@ -38,7 +39,9 @@ const NewsFeed = ({ userProfile }) => {
   const load = useCallback(async () => {
     try {
       setError(null);
-      const data = await fetchNews(filter);
+      // portfolio 필터는 전체 뉴스를 받아서 클라이언트에서 필터링
+      const apiFilter = filter === 'portfolio' ? 'all' : filter;
+      const data = await fetchNews(apiFilter);
       setArticles(data);
       setLastUpdate(new Date());
     } catch (e) {
@@ -60,12 +63,15 @@ const NewsFeed = ({ userProfile }) => {
     return () => clearInterval(interval);
   }, [load]);
 
-  // 포트폴리오 관련 기사 상단 정렬
-  const sorted = [...articles].sort((a, b) => {
-    const ar = isRelated(a, portfolio) ? 1 : 0;
-    const br = isRelated(b, portfolio) ? 1 : 0;
-    return br - ar;
-  });
+  // 내 종목 필터: 포트폴리오 관련 기사만 표시
+  // 그 외 필터: 포트폴리오 관련 기사를 상단 정렬
+  const sorted = filter === 'portfolio'
+    ? articles.filter(a => isRelated(a, portfolio))
+    : [...articles].sort((a, b) => {
+        const ar = isRelated(a, portfolio) ? 1 : 0;
+        const br = isRelated(b, portfolio) ? 1 : 0;
+        return br - ar;
+      });
 
   return (
     <div className="flex flex-col h-full">
@@ -140,8 +146,16 @@ const NewsFeed = ({ userProfile }) => {
         {/* 뉴스 목록 */}
         {!loading && !error && (
           <div className="p-3 space-y-2">
-            {sorted.length === 0 ? (
-              <div className="text-center py-12 text-gray-400 text-sm">뉴스가 없습니다</div>
+            {filter === 'portfolio' && portfolio.length === 0 ? (
+              <div className="text-center py-12 px-4">
+                <div className="text-3xl mb-3">📋</div>
+                <p className="text-sm font-semibold text-gray-700 mb-1">관심 종목이 없어요</p>
+                <p className="text-xs text-gray-400">설정 → 프로필에서 관심 종목을 추가하면<br />해당 종목 뉴스만 모아볼 수 있어요</p>
+              </div>
+            ) : sorted.length === 0 ? (
+              <div className="text-center py-12 text-gray-400 text-sm">
+                {filter === 'portfolio' ? '관심 종목 관련 뉴스가 없습니다' : '뉴스가 없습니다'}
+              </div>
             ) : sorted.map(item => {
               const related = isRelated(item, portfolio);
               return (
