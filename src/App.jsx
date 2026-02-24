@@ -342,7 +342,7 @@ function App() {
 
       {/* ===== 왼쪽 사이드바 ===== */}
       <aside className={`
-        ${isMobile ? 'fixed top-0 bottom-16 left-0 z-50' : 'relative'}
+        ${isMobile ? 'fixed inset-y-0 left-0 z-50' : 'relative'}
         ${isMobile
           ? (leftSidebarOpen ? 'translate-x-0' : '-translate-x-full')
           : (leftSidebarOpen ? 'w-64 lg:w-72' : 'w-0')
@@ -564,11 +564,11 @@ function App() {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {!isMobile && (
               <span className="text-xs text-gray-400 mr-2">{displayedEvents.length}개 이벤트</span>
             )}
-            {/* 이벤트 추가 (데스크탑 빠른 접근) */}
+            {/* 이벤트 추가 (데스크탑) */}
             {!isMobile && (
               <button
                 onClick={() => setShowCreateEvent(true)}
@@ -580,6 +580,29 @@ function App() {
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
               </button>
+            )}
+            {/* 모바일 빠른 접근: AI · 뉴스 (네비바 대체) */}
+            {isMobile && (
+              <>
+                <button
+                  onClick={() => openMobilePanel('ai')}
+                  className={`p-2 rounded-lg transition ${rightPanelOpen && rightPanelTab === 'ai' ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100 text-gray-500'}`}
+                  title="AI 채팅"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => openMobilePanel('news')}
+                  className={`p-2 rounded-lg transition ${rightPanelOpen && rightPanelTab === 'news' ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100 text-gray-500'}`}
+                  title="뉴스"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  </svg>
+                </button>
+              </>
             )}
             <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className="p-2 hover:bg-gray-100 rounded-lg transition">
               <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -628,7 +651,7 @@ function App() {
         )}
 
         {/* 캘린더 */}
-        <div className={`flex-1 overflow-hidden p-3 md:p-4 ${isMobile ? 'pb-20' : ''}`}>
+        <div className="flex-1 overflow-hidden p-3 md:p-4">
           <div className="h-full max-w-full mx-auto">
             <CalendarView
               events={displayedEvents}
@@ -640,47 +663,6 @@ function App() {
           </div>
         </div>
 
-        {/* 모바일 하단 네비게이션 */}
-        {isMobile && (
-          <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex items-center justify-around py-2 px-1 z-[55] safe-area-bottom">
-            <button onClick={() => { setRightPanelOpen(false); setLeftSidebarOpen(false); }}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition ${!rightPanelOpen && !leftSidebarOpen ? 'text-blue-600' : 'text-gray-400'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span className="text-xs font-medium">캘린더</span>
-            </button>
-            <button onClick={() => openMobilePanel('ai')}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition ${rightPanelOpen && rightPanelTab === 'ai' ? 'text-blue-600' : 'text-gray-400'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-              <span className="text-xs font-medium">AI</span>
-            </button>
-            <button onClick={() => openMobilePanel('risk')}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition ${rightPanelOpen && rightPanelTab === 'risk' ? 'text-blue-600' : 'text-gray-400'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              <span className="text-xs font-medium">분석</span>
-            </button>
-            <button onClick={() => openMobilePanel('news')}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition ${rightPanelOpen && rightPanelTab === 'news' ? 'text-blue-600' : 'text-gray-400'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-              </svg>
-              <span className="text-xs font-medium">뉴스</span>
-            </button>
-            <button onClick={() => setLeftSidebarOpen(true)}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition ${leftSidebarOpen ? 'text-blue-600' : 'text-gray-400'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span className="text-xs font-medium">설정</span>
-            </button>
-          </nav>
-        )}
       </main>
 
       {/* 오른쪽 패널 오버레이 (모바일) */}
@@ -701,8 +683,8 @@ function App() {
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
         style={isMobile ? {
-          bottom: `${keyboardHeight > 10 ? keyboardHeight + 4 : 64}px`,
-          overscrollBehavior: 'contain',   // 스크롤 끝에서 오버스크롤이 오버레이로 전파되지 않도록
+          bottom: `${keyboardHeight > 10 ? keyboardHeight + 4 : 0}px`,
+          overscrollBehavior: 'contain',
         } : {}}
         className={`
         ${isMobile ? 'fixed top-0 right-0 z-50 w-[85vw] max-w-sm' : 'relative'}
