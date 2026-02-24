@@ -271,6 +271,9 @@ function App() {
     setRightPanelOpen(true);
   };
 
+  // 오버레이 스와이프 vs 탭 구분용 ref
+  const overlayTouchMoved = React.useRef(false);
+
   // ========================
   //  로딩 & 에러 화면
   // ========================
@@ -663,12 +666,22 @@ function App() {
       </main>
 
       {/* 오른쪽 패널 오버레이 (모바일) */}
+      {/* 스크롤(touchmove) 후 click은 무시 → 순수 탭만 닫기 */}
       {isMobile && rightPanelOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity" onClick={() => setRightPanelOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+          onTouchStart={() => { overlayTouchMoved.current = false; }}
+          onTouchMove={() => { overlayTouchMoved.current = true; }}
+          onClick={() => { if (!overlayTouchMoved.current) setRightPanelOpen(false); }}
+        />
       )}
 
       {/* ===== 오른쪽 사이드바 ===== */}
-      <aside className={`
+      {/* 패널 내부 click/touch 이벤트가 오버레이로 버블링되지 않도록 차단 */}
+      <aside
+        onClick={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+        className={`
         ${isMobile ? 'fixed inset-y-0 right-0 z-50 w-[85vw] max-w-sm' : 'relative'}
         ${isMobile
           ? (rightPanelOpen ? 'translate-x-0' : 'translate-x-full')
