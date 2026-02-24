@@ -324,7 +324,7 @@ function App() {
 
       {/* ===== 왼쪽 사이드바 ===== */}
       <aside className={`
-        ${isMobile ? 'fixed inset-y-0 left-0 z-50' : 'relative'}
+        ${isMobile ? 'fixed top-0 bottom-16 left-0 z-50' : 'relative'}
         ${isMobile
           ? (leftSidebarOpen ? 'translate-x-0' : '-translate-x-full')
           : (leftSidebarOpen ? 'w-64 lg:w-72' : 'w-0')
@@ -677,12 +677,12 @@ function App() {
       )}
 
       {/* ===== 오른쪽 사이드바 ===== */}
-      {/* 패널 내부 click/touch 이벤트가 오버레이로 버블링되지 않도록 차단 */}
+      {/* onClick stopPropagation: 패널 내 클릭이 오버레이로 전파되지 않도록 */}
+      {/* 모바일에서 bottom-16(64px)으로 하단 네비바 영역을 피함 */}
       <aside
         onClick={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
         className={`
-        ${isMobile ? 'fixed inset-y-0 right-0 z-50 w-[85vw] max-w-sm' : 'relative'}
+        ${isMobile ? 'fixed top-0 bottom-16 right-0 z-50 w-[85vw] max-w-sm' : 'relative'}
         ${isMobile
           ? (rightPanelOpen ? 'translate-x-0' : 'translate-x-full')
           : (rightPanelOpen ? 'w-80' : 'w-0')
